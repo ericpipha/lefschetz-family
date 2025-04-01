@@ -260,10 +260,10 @@ Homology related properties:
 - `intersection_product`: the intersection matrix of the surface in the basis `homology`.
 - `morsify`: a map taking a combination of extensions and returning its coordinates on the basis of thimbles of the morsification.
 - `lift`: a map taking a combination of thimbles of the morsification with empty boundary and returning its class in `homology`.
-- `types`: `types[i]` is the type of the fibre above `critical_values[i]`. It is given as a triple `t, M, nu` where `t` is the letter of the type of the fibre (`'I'`, `'II'`, etc.), `M` is the $\operatorname{SL}_2(\mathbb Z)$ matrices so that `M**(-1)*monodromy_matrices[i]*M` is the representative $M_T$ of the monodromy class (see Table 1. of the paper), and `nu` is the multiplicity of the fibre in the cases where `t` is `'I'` or `'I*'` (otherwise `nu` is `1`). 
+- `types`: `types[i]` is the type of the fibre above `critical_values[i]`. It is given as a triple `t, M, nu` where `t` is the letter of the type of the fibre (`'I'`, `'II'`, etc.), `M` is the ${SL}_2(\mathbb Z)$ matrices so that `M**(-1)*monodromy_matrices[i]*M` is the representative $M_T$ of the monodromy class (see Table 1. of the paper), and `nu` is the multiplicity of the fibre in the cases where `t` is `'I'` or `'I*'` (otherwise `nu` is `1`). 
 
 Cohomology related properties:
-- `holomorphic_forms`: a basis of rational functions $f(t)$ such that $f(t) \operatorname{Res}\frac{\Omega_2}{P_t}\wedge\mathrm dt$ is a holomorphic form of $S$.
+- `holomorphic_forms`: a basis of rational functions $f(t)$ such that $f(t) {Res}\frac{\Omega_2}{P_t}\wedge\mathrm dt$ is a holomorphic form of $S$.
 - `picard_fuchs_equations`: the list of the Picard-Fuchs equations of the holomorphic forms mentionned previously.
 
 Period related properties:
@@ -327,7 +327,7 @@ Homology related properties:
 - `lift`: a map taking a combination of thimbles of the morsification with empty boundary and returning its class in `homology`.
 
 Cohomology related properties:
-- `holomorphic_forms`: a basis of rational functions $f(t)$ such that $f(t) \operatorname{Res}\frac{\Omega_2}{P_t}\wedge\mathrm dt$ is a holomorphic form of $S$.
+- `holomorphic_forms`: a basis of rational functions $f(t)$ such that $f(t) {Res}\frac{\Omega_2}{P_t}\wedge\mathrm dt$ is a holomorphic form of $S$.
 
 Period related properties:
 - `period_matrix`: the holomorphic periods of $X$ in the bases `self.homology` and `self.holomorphic_forms`.
