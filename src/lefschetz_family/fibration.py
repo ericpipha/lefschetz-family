@@ -93,9 +93,10 @@ class Fibration(object):
         dim = self.fibre.dim
         deg = self.fibre.degree
         res = 0
+        smax = (dmax + dim + 1) // deg
         for c, w in zip(v, self.fibre.cohomology):
-            s = (w.degree() + dim + 1) % deg
-            res += self.P.parent()(factorial(s-1) * self.P**(dmax-s) * w) * self.P.parent(c)
+            s = (w.degree() + dim + 1) // deg
+            res += self.P.parent()(factorial(s) * self.P**(smax-s) * w) * self.P.parent(c)
         return res
 
 
