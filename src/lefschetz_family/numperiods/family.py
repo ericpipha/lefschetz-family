@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 class Family(object):
 
-    def __init__(self, pol, denom=1, path=None, discoverbasis=False, shift=0):
+    def __init__(self, pol, denom=1, basepoint=None, path=None, discoverbasis=False, shift=0):
         """pol is an element of a ring of the form K[x1,...,xn][t]
 
         This class aims at computing in H^n( P^n - V(pol(t)) ).
@@ -68,7 +68,10 @@ class Family(object):
             self._path = path
             self._explicit_path = True
 
-        self.coho1 = self.cohomologyAt(self._path[-1])
+        if basepoint is None:
+            basepoint = self._path[-1]
+
+        self.coho1 = self.cohomologyAt(basepoint)
 
         # This is crucial that we choose the basis at 1.
         self.discoverbasis = discoverbasis
