@@ -190,19 +190,17 @@ class DoubleCover(object):
         assert self.smooth,"Cannot compute cohomology of singular double covers (yet)."
         return Cohomology(self.P, shift=self.shift).basis()
     
-    @property
+    @lazy_attribute
     def family(self):
-        if not hasattr(self,'_family'):
-            if self.dim==1:
-                R = PolynomialRing(QQ, ['x0','x1'])
-                S = PolynomialRing(R, 't')
-                t = S.gens()[0]
-                x0,x1 = R.gens()
-                self._family = Family(x0**2+x1**2*self.P(t+1, 1))
-            else:
-                denom, RtoS = self._RtoS()
-                self._family = Family(RtoS(self.P), denom=denom**self.degree, shift=self.shift)
-        return self._family
+        if self.dim==1:
+            R = PolynomialRing(QQ, ['x0','x1'])
+            S = PolynomialRing(R, 't')
+            t = S.gens()[0]
+            x0,x1 = R.gens()
+            return Family(x0**2+x1**2*self.P(t+1, 1))
+        else:
+            denom, RtoS = self._RtoS()
+            return Family(RtoS(self.P), denom=denom**self.degree, shift=self.shift)
     
 
     @property
