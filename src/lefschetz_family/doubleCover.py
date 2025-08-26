@@ -46,7 +46,7 @@ from sage.misc.prandom import randint
 from .voronoi import FundamentalGroupVoronoi
 from .integrator_simultaneous import IntegratorSimultaneous
 from .integrator import Integrator
-from .util import Util
+from .util import Util, lazy_attribute
 from .context import Context
 from .exceptionalDivisorComputer import ExceptionalDivisorComputer
 from .delaunayDual import FundamentalGroupDelaunayDual
@@ -413,11 +413,9 @@ class DoubleCover(object):
             logger.info("Thimble monodromy computed in %s.", duration_str)
         return self._thimble_monodromy
     
-    @property
+    @lazy_attribute
     def invariant(self): # TODO : in dim >0 this is just the fibre. 
-        if not hasattr(self, '_invariant'):
-            self._invariant = vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
-        return self._invariant
+        return vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
 
     @property
     def exceptional_divisors(self):

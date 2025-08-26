@@ -50,7 +50,7 @@ from sage.misc.prandom import randint
 from .voronoi import FundamentalGroupVoronoi
 from .integrator_simultaneous import IntegratorSimultaneous
 from .integrator import Integrator
-from .util import Util
+from .util import Util, lazy_attribute
 from .context import Context
 from .exceptionalDivisorComputer import ExceptionalDivisorComputer
 from .delaunayDual import FundamentalGroupDelaunayDual
@@ -144,17 +144,15 @@ class Hypersurface(object):
                 self._homology = product_with_exdiv.kernel().basis()
         return self._homology
 
-    @property
+    @lazy_attribute
     def period_matrix_modification(self):
         """The period matrix of the modification of the hypersurface"""
-        if not hasattr(self, '_period_matrix_modification'):
-            integrated_thimbles = self.integrated_thimbles
-            add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
-            add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
-            homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
-            primary_lattice = self.monodromy_representation.primary_lattice
-            self._period_matrix_modification =  integrated_thimbles * homology_mat * primary_lattice.inverse()
-        return self._period_matrix_modification
+        integrated_thimbles = self.integrated_thimbles
+        add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
+        add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
+        homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
+        primary_lattice = self.monodromy_representation.primary_lattice
+        return integrated_thimbles * homology_mat * primary_lattice.inverse()
 
     @property
     def period_matrix(self):
@@ -400,11 +398,9 @@ class Hypersurface(object):
             logger.info("Thimble monodromy computed in %s.", duration_str)
         return self._thimble_monodromy
     
-    @property
+    @lazy_attribute
     def invariant(self): # TODO : in dim >0 this is just the fibre. 
-        if not hasattr(self, '_invariant'):
-            self._invariant = vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
-        return self._invariant
+        return vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
 
     @property
     def exceptional_divisors(self):

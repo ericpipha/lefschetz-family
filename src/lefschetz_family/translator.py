@@ -23,7 +23,7 @@ from sage.groups.free_group import FreeGroup
 
 from sage.rings.complex_mpfr import ComplexField
 
-from .util import Util
+from .util import Util, lazy_attribute
 
 import logging
 
@@ -129,28 +129,24 @@ class Translator(object):
                 w = letters[edges.index(dual)] * w
         return w
     
-    @property
+    @lazy_attribute
     def thin_gens(self):
-        if not hasattr(self, "_thin_gens"):
-            self._thin_gens = [self.B.pointed_loops[i-1] for i in self.AtoB[1:]]
-        return self._thin_gens
+        return [self.B.pointed_loops[i-1] for i in self.AtoB[1:]]
     
-    @property
+    @lazy_attribute
     def fat_gens(self):
-        if not hasattr(self, "_fat_gens"):
-            points = [i-1 for i in self.AtoB[1:]]
-            paths = [[]]
-            first=True
-            for i, path in enumerate(self.B.pointed_loops):
-                if i in points:
-                    if first:
-                        first = False
-                    else:
-                        paths += [[]]
-                if i!=self.AtoB[0]-1:
-                    paths[-1] += path
-            self._fat_gens = [Util.simplify_path(path) for path in paths]
-        return self._fat_gens
+        points = [i-1 for i in self.AtoB[1:]]
+        paths = [[]]
+        first=True
+        for i, path in enumerate(self.B.pointed_loops):
+            if i in points:
+                if first:
+                    first = False
+                else:
+                    paths += [[]]
+            if i!=self.AtoB[0]-1:
+                paths[-1] += path
+        return [Util.simplify_path(path) for path in paths]
     
     @property
     def lift(self):
