@@ -102,33 +102,29 @@ class Hypersurface(object):
         assert self.dim!=0, "no modification in dimension 0"
         return self.monodromy_representation.intersection_product
 
-    @property
+    @lazy_attribute
     def monodromy_representation(self):
         """The monodromy representation associated to the modification of the hypersurface"""
-        if not hasattr(self,'_monodromy_representation'):
-            assert self.dim!=0, "no monodromy_representation in dimension 0"
-            if self.dim == 2:
-                monodromy_representation = MonodromyRepresentationSurface(self.monodromy_matrices, self.fibre.intersection_product)
-            else:
-                monodromy_representation = MonodromyRepresentationGeneric(self.monodromy_matrices, self.fibre.intersection_product)
-                monodromy_representation._add = 0 if self.dim%2==1 else 2
-            self._monodromy_representation = monodromy_representation
-        return self._monodromy_representation
+        assert self.dim!=0, "no monodromy_representation in dimension 0"
+        if self.dim == 2:
+            monodromy_representation = MonodromyRepresentationSurface(self.monodromy_matrices, self.fibre.intersection_product)
+        else:
+            monodromy_representation = MonodromyRepresentationGeneric(self.monodromy_matrices, self.fibre.intersection_product)
+            monodromy_representation._add = 0 if self.dim%2==1 else 2
+        return monodromy_representation
     
-    @property
+    @lazy_attribute
     def intersection_product(self):
         """The intersection matrix of the hypersurface"""
-        if not hasattr(self,'_intersection_product'):
-            if self.dim==0:
-                self._intersection_product = identity_matrix(self.degree)
-            elif self.dim==1:
-                self._intersection_product = self.intersection_product_modification
-            else:
-                homology = matrix(self.homology)
-                IP = homology * self.intersection_product_modification * homology.transpose()
-                assert IP.det() in [1,-1], "intersection product is not unitary"
-                self._intersection_product = IP
-        return self._intersection_product
+        if self.dim==0:
+            return identity_matrix(self.degree)
+        elif self.dim==1:
+            return self.intersection_product_modification
+        else:
+            homology = matrix(self.homology)
+            IP = homology * self.intersection_product_modification * homology.transpose()
+            assert IP.det() in [1,-1], "intersection product is not unitary"
+            return IP
 
     @property
     def homology(self):
@@ -329,17 +325,14 @@ class Hypersurface(object):
     def vanishing_cycles(self):
         return flatten(self.monodromy_representation.vanishing_cycles_desingularisation)
 
-    @property
+    @lazy_attribute
     def extensions(self):
-        if not hasattr(self, '_extensions'):
-            if self.dim==0:
-                R = self.P.parent()
-                affineR = PolynomialRing(QQbar, 'X')
-                affineProjection = R.hom([affineR.gens()[0],1], affineR)
-                self._extensions = [e[0] for e in affineProjection(self.P).roots()]
-                return self._extensions
-            self._extensions = self.monodromy_representation.extensions
-        return self._extensions
+        if self.dim==0:
+            R = self.P.parent()
+            affineR = PolynomialRing(QQbar, 'X')
+            affineProjection = R.hom([affineR.gens()[0],1], affineR)
+            return [e[0] for e in affineProjection(self.P).roots()]
+        return self.monodromy_representation.extensions
 
     @property
     def thimble_extensions(self):
