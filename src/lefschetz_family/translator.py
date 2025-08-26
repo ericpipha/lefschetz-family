@@ -44,31 +44,25 @@ class Translator(object):
         self.B = B
 
 
-    @property
+    @lazy_attribute
     def AtoB(self):
-        if not hasattr(self, "_AtoB"):
-            self._AtoB = [Util.select_closest_index(self.B.qpoints, p) for p in self.A.qpoints]
-        return self._AtoB
+        return [Util.select_closest_index(self.B.qpoints, p) for p in self.A.qpoints]
 
     
-    @property
+    @lazy_attribute
     def edges_tree(self):
         """This tree will serve as the alphabet for the fundamental group"""
-        if not hasattr(self, "_edges_tree"):
-            minimal_cover_tree = Graph(len(self.A.qpoints)) 
-            edges = flatten([[(i,j) for i in range(j)] for j in range(len(self.A.qpoints))], max_level=1) 
-            edges.sort(key=(lambda e: Util.simple_rational(abs(CC(self.A.qpoints[e[0]]-self.A.qpoints[e[1]])), 10e-10))) # we sort edges by length
-            for e in edges:
-                if len(minimal_cover_tree.shortest_path(e[0], e[1]))==0:
-                    minimal_cover_tree.add_edge(e)
-            self._edges_tree = [list(e)[:2] for e in minimal_cover_tree.edges()]
-        return self._edges_tree
+        minimal_cover_tree = Graph(len(self.A.qpoints)) 
+        edges = flatten([[(i,j) for i in range(j)] for j in range(len(self.A.qpoints))], max_level=1) 
+        edges.sort(key=(lambda e: Util.simple_rational(abs(CC(self.A.qpoints[e[0]]-self.A.qpoints[e[1]])), 10e-10))) # we sort edges by length
+        for e in edges:
+            if len(minimal_cover_tree.shortest_path(e[0], e[1]))==0:
+                minimal_cover_tree.add_edge(e)
+        return [list(e)[:2] for e in minimal_cover_tree.edges()]
     
-    @property
+    @lazy_attribute
     def alphabet(self):
-        if not hasattr(self, "_alphabet"):
-            self._alphabet = FreeGroup(len(self.edges_tree))
-        return self._alphabet
+        return FreeGroup(len(self.edges_tree))
     
     @property
     def letters(self):

@@ -83,13 +83,11 @@ class DoubleCover(object):
             fg = self.fundamental_group # this allows reordering the critical points straight away and prevents shenanigans. There should be a better way to do this
     
     
-    @property
+    @lazy_attribute
     def intersection_product_modification(self):
         """The intersection matrix of the modification of the hypersurface"""
-        if not hasattr(self,'_intersection_product_modification'):
-            assert self.dim!=0, "no modification in dimension 0"
-            self._intersection_product_modification = self.monodromy_representation.intersection_product
-        return self._intersection_product_modification
+        assert self.dim!=0, "no modification in dimension 0"
+        return self.monodromy_representation.intersection_product
 
     @property
     def monodromy_representation(self):
@@ -181,13 +179,11 @@ class DoubleCover(object):
                 self._holomorphic_period_matrix = periods_modification * homology
         return self._holomorphic_period_matrix
 
-    @property
+    @lazy_attribute
     def holomorphic_forms(self):
         """The holomorphic cohomology classes."""
-        if not hasattr(self, "_holomorphic_forms"):
-            mindeg = min([m.degree() for m in self.cohomology])
-            self._holomorphic_forms = [m for m in self.cohomology if m.degree()==mindeg]
-        return self._holomorphic_forms
+        mindeg = min([m.degree() for m in self.cohomology])
+        return [m for m in self.cohomology if m.degree()==mindeg]
 
 
     @property
@@ -195,24 +191,18 @@ class DoubleCover(object):
         """The defining equation of the hypersurface."""
         return self._P
 
-    @property
+    @lazy_attribute
     def degree(self):
-        if not hasattr(self,'_degree'):
-            self._degree = self.P.degree()
-        return self._degree
+        return self.P.degree()
     
-    @property
+    @lazy_attribute
     def dim(self):
-        if not hasattr(self,'_dim'):
-            self._dim = len(self.P.parent().gens())-1
-        return self._dim
+        return len(self.P.parent().gens())-1
 
-    @property
+    @lazy_attribute
     def cohomology(self):
-        if not hasattr(self,'_cohomology'):
-            assert self.smooth,"Cannot compute cohomology of singular double covers (yet)."
-            self._cohomology = Cohomology(self.P, shift=self.shift).basis()
-        return self._cohomology
+        assert self.smooth,"Cannot compute cohomology of singular double covers (yet)."
+        return Cohomology(self.P, shift=self.shift).basis()
     
     @property
     def family(self):
