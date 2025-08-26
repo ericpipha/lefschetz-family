@@ -113,67 +113,57 @@ class DoubleCover(object):
             assert IP.det() in [1,-1], "intersection product is not unitary"
             return IP
 
-    @property
+    @lazy_attribute
     def homology(self):
         """An embedding of the homology of the hypersurface in the homology of the modification."""
-        if not hasattr(self,'_homology'):
-            if self.dim<2:
-                self._homology = identity_matrix(len(self.extensions)).rows()
-            else:
-                exceptional_divisors = matrix(self.exceptional_divisors).transpose()
-                product_with_exdiv = self.intersection_product_modification * exceptional_divisors
-                product_with_exdiv = product_with_exdiv.change_ring(ZZ)
-                self._homology = product_with_exdiv.kernel().basis()
-        return self._homology
+        if self.dim<2:
+            return identity_matrix(len(self.extensions)).rows()
+        else:
+            exceptional_divisors = matrix(self.exceptional_divisors).transpose()
+            product_with_exdiv = self.intersection_product_modification * exceptional_divisors
+            product_with_exdiv = product_with_exdiv.change_ring(ZZ)
+            return product_with_exdiv.kernel().basis()
 
-    @property
+    @lazy_attribute
     def period_matrix_modification(self):
         """The period matrix of the modification of the hypersurface"""
-        if not hasattr(self, '_period_matrix_modification'):
-            integrated_thimbles = self.integrated_thimbles
-            add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
-            add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
-            homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
-            primary_lattice = self.monodromy_representation.primary_lattice
-            self._period_matrix_modification =  integrated_thimbles * homology_mat * primary_lattice.inverse()
-        return self._period_matrix_modification
+        integrated_thimbles = self.integrated_thimbles
+        add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
+        add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
+        homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
+        primary_lattice = self.monodromy_representation.primary_lattice
+        return integrated_thimbles * homology_mat * primary_lattice.inverse()
 
-    @property
+    @lazy_attribute
     def period_matrix(self):
         """The period matrix of the hypersurface"""
-        if not hasattr(self, '_period_matrix'):
-            if self.dim%2 == 1:
-                self._period_matrix = self.period_matrix_modification * matrix(self.homology).transpose()
-            else:
-                self._period_matrix = block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
-        return self._period_matrix
+        if self.dim%2 == 1:
+            return self.period_matrix_modification * matrix(self.homology).transpose()
+        else:
+            return block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
     
-    @property
+    @lazy_attribute
     def holomorphic_period_matrix_modification(self):
         """The holomorphic period matrix of the modification of the hypersurface"""
-        if not hasattr(self, '_holomorphic_period_matrix_modification'):
-            if self.dim==0:
-                self._holomorphic_period_matrix_modification = self.period_matrix
-            else:
-                integrated_thimbles_holomorphic = self.integrated_thimbles_holomorphic
-                add = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
-                add += [vector([0]*len(self.monodromy_representation.thimbles))]*2 if self.dim%2 ==0 else []
-                homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
-                primary_lattice = self.monodromy_representation.primary_lattice
-                self._holomorphic_period_matrix_modification =  integrated_thimbles_holomorphic * homology_mat * primary_lattice.inverse()
-        return self._holomorphic_period_matrix_modification
+        if self.dim==0:
+            return self.period_matrix
+        else:
+            integrated_thimbles_holomorphic = self.integrated_thimbles_holomorphic
+            add = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
+            add += [vector([0]*len(self.monodromy_representation.thimbles))]*2 if self.dim%2 ==0 else []
+            homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
+            primary_lattice = self.monodromy_representation.primary_lattice
+            return integrated_thimbles_holomorphic * homology_mat * primary_lattice.inverse()
 
-    @property
+    @lazy_attribute
     def holomorphic_period_matrix(self):
         """The holomorphic period matrix of the hypersurface"""
-        if not hasattr(self, '_holomorphic_period_matrix'):
-            if self.dim==0:
-                self._holomorphic_period_matrix = self.period_matrix
-            else:
-                periods_modification = self.holomorphic_period_matrix_modification
-                homology = matrix(self.homology).transpose()
-                self._holomorphic_period_matrix = periods_modification * homology
-        return self._holomorphic_period_matrix
+        if self.dim==0:
+            return self.period_matrix
+        else:
+            periods_modification = self.holomorphic_period_matrix_modification
+            homology = matrix(self.homology).transpose()
+            return periods_modification * homology
 
     @lazy_attribute
     def holomorphic_forms(self):
