@@ -155,22 +155,19 @@ class Hypersurface(object):
         primary_lattice = self.monodromy_representation.primary_lattice
         return integrated_thimbles * homology_mat * primary_lattice.inverse()
 
-    @property
+    @lazy_attribute
     def period_matrix(self):
         """The period matrix of the hypersurface"""
-        if not hasattr(self, '_period_matrix'):
-            if self.dim==0:
-                R = self.P.parent()
-                affineR = PolynomialRing(QQbar, 'X')
-                affineProjection = R.hom([affineR.gens()[0],1], affineR)
-                period_matrix = matrix([self._residue_form(affineProjection(b), affineProjection(self.P), (b.degree()+len(R.gens()))//self.P.degree(), self.extensions) for b in self.cohomology]).change_ring(self.ctx.CBF)
-                period_matrix = block_matrix([[period_matrix],[matrix([[1]*self.degree])]])
-                self._period_matrix=period_matrix
-            elif self.dim%2 ==1:
-                self._period_matrix = self.period_matrix_modification * matrix(self.homology).transpose()
-            else:
-                self._period_matrix = block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
-        return self._period_matrix
+        if self.dim==0:
+            R = self.P.parent()
+            affineR = PolynomialRing(QQbar, 'X')
+            affineProjection = R.hom([affineR.gens()[0],1], affineR)
+            period_matrix = matrix([self._residue_form(affineProjection(b), affineProjection(self.P), (b.degree()+len(R.gens()))//self.P.degree(), self.extensions) for b in self.cohomology]).change_ring(self.ctx.CBF)
+            return block_matrix([[period_matrix],[matrix([[1]*self.degree])]])
+        elif self.dim%2 ==1:
+            return self.period_matrix_modification * matrix(self.homology).transpose()
+        else:
+            return block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
     
     @property
     def holomorphic_period_matrix_modification(self):
