@@ -20,10 +20,11 @@
 from sage.misc.flatten import flatten
 from sage.graphs.graph import Graph
 from sage.groups.free_group import FreeGroup
+from sage.misc.lazy_attribute import lazy_attribute
 
 from sage.rings.complex_mpfr import ComplexField
 
-from .util import Util, lazy_attribute
+from .util import Util
 
 import logging
 

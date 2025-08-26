@@ -42,11 +42,12 @@ from sage.quadratic_forms.quadratic_form import QuadraticForm
 from sage.misc.flatten import flatten
 
 from sage.misc.prandom import randint
+from sage.misc.lazy_attribute import lazy_attribute
 
 from .voronoi import FundamentalGroupVoronoi
 from .integrator_simultaneous import IntegratorSimultaneous
 from .integrator import Integrator
-from .util import Util, lazy_attribute
+from .util import Util
 from .context import Context
 from .exceptionalDivisorComputer import ExceptionalDivisorComputer
 from .delaunayDual import FundamentalGroupDelaunayDual

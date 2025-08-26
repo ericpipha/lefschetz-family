@@ -39,38 +39,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def lazy_attribute(func):
-    """
-    A decorator that converts a method into a lazy attribute.
-    
-    The method is called only once, the first time the attribute is accessed.
-    The result is cached and returned on subsequent accesses.
-    
-    This replaces the common pattern:
-        @property
-        def attr(self):
-            if not hasattr(self, '_attr'):
-                self._attr = compute_value()
-            return self._attr
-    
-    With the simpler:
-        @lazy_attribute
-        def attr(self):
-            return compute_value()
-    """
-    attr_name = f'_{func.__name__}'
-    
-    def wrapper(self):
-        if not hasattr(self, attr_name):
-            setattr(self, attr_name, func(self))
-        return getattr(self, attr_name)
-    
-    # Copy over the function's metadata
-    wrapper.__name__ = func.__name__
-    wrapper.__doc__ = func.__doc__
-    wrapper.__module__ = func.__module__
-    
-    return property(wrapper)
+
 
 
 class Util(object):
