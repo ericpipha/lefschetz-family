@@ -20,6 +20,7 @@
 from sage.misc.flatten import flatten
 from sage.graphs.graph import Graph
 from sage.groups.free_group import FreeGroup
+from sage.misc.lazy_attribute import lazy_attribute
 
 from sage.rings.complex_mpfr import ComplexField
 
@@ -43,64 +44,56 @@ class Translator(object):
         self.B = B
 
 
-    @property
+    @lazy_attribute
     def AtoB(self):
-        if not hasattr(self, "_AtoB"):
-            self._AtoB = [Util.select_closest_index(self.B.qpoints, p) for p in self.A.qpoints]
-        return self._AtoB
+        return [Util.select_closest_index(self.B.qpoints, p) for p in self.A.qpoints]
 
     
-    @property
+    @lazy_attribute
     def edges_tree(self):
         """This tree will serve as the alphabet for the fundamental group"""
-        if not hasattr(self, "_edges_tree"):
-            minimal_cover_tree = Graph(len(self.A.qpoints)) 
-            edges = flatten([[(i,j) for i in range(j)] for j in range(len(self.A.qpoints))], max_level=1) 
-            edges.sort(key=(lambda e: Util.simple_rational(abs(CC(self.A.qpoints[e[0]]-self.A.qpoints[e[1]])), 10e-10))) # we sort edges by length
-            for e in edges:
-                if len(minimal_cover_tree.shortest_path(e[0], e[1]))==0:
-                    minimal_cover_tree.add_edge(e)
-            self._edges_tree = [list(e)[:2] for e in minimal_cover_tree.edges()]
-        return self._edges_tree
+        minimal_cover_tree = Graph(len(self.A.qpoints)) 
+        edges = flatten([[(i,j) for i in range(j)] for j in range(len(self.A.qpoints))], max_level=1) 
+        edges.sort(key=(lambda e: Util.simple_rational(abs(CC(self.A.qpoints[e[0]]-self.A.qpoints[e[1]])), 10e-10))) # we sort edges by length
+        for e in edges:
+            if len(minimal_cover_tree.shortest_path(e[0], e[1]))==0:
+                minimal_cover_tree.add_edge(e)
+        return [list(e)[:2] for e in minimal_cover_tree.edges()]
     
-    @property
+    @lazy_attribute
     def alphabet(self):
-        if not hasattr(self, "_alphabet"):
-            self._alphabet = FreeGroup(len(self.edges_tree))
-        return self._alphabet
+        return FreeGroup(len(self.edges_tree))
     
     @property
     def letters(self):
         return self.alphabet.gens()
     
-    @property
+    @lazy_attribute
     def Bduality(self):
-        if not hasattr(self, "_Bduality"):
-            edgesB = []
-            for e,d in self.B.duality:
-                if d not in edgesB and list(reversed(d)) not in edgesB:
-                    edgesB += [d]
+        edgesB = []
+        for e,d in self.B.duality:
+            if d not in edgesB and list(reversed(d)) not in edgesB:
+                edgesB += [d]
 
-            delaunay = Graph()
-            for e in edgesB:
-                dist = Util.simple_rational(abs(CC(self.B.qpoints[e[0]]-self.B.qpoints[e[1]])), 10**-10)
-                delaunay.add_edge(e + [dist])
+        delaunay = Graph()
+        for e in edgesB:
+            dist = Util.simple_rational(abs(CC(self.B.qpoints[e[0]]-self.B.qpoints[e[1]])), 10**-10)
+            delaunay.add_edge(e + [dist])
 
-            edgesA = [[self.AtoB[i] for i in e] for e in self.edges_tree]
-            paths = []
-            for e in edgesA:
-                paths += [delaunay.shortest_path(e[0], e[1], by_weight=True)] 
+        edgesA = [[self.AtoB[i] for i in e] for e in self.edges_tree]
+        paths = []
+        for e in edgesA:
+            paths += [delaunay.shortest_path(e[0], e[1], by_weight=True)] 
 
-            Bduality = []
-            for dA, path in zip(self.edges_tree, paths):
-                for i in range(len(path)-1):
-                    e = path[i:i+2]
-                    for e2,d2 in self.B.duality:
-                        if d2 == e:
-                            Bduality += [[e2, dA]]
-                            break
-            self._Bduality = Bduality
-        return self._Bduality
+        Bduality = []
+        for dA, path in zip(self.edges_tree, paths):
+            for i in range(len(path)-1):
+                e = path[i:i+2]
+                for e2,d2 in self.B.duality:
+                    if d2 == e:
+                        Bduality += [[e2, dA]]
+                        break
+        return Bduality
 
     def wordA(self, path):
         """Given a path of A, return its word in terms of the tree"""
@@ -129,36 +122,30 @@ class Translator(object):
                 w = letters[edges.index(dual)] * w
         return w
     
-    @property
+    @lazy_attribute
     def thin_gens(self):
-        if not hasattr(self, "_thin_gens"):
-            self._thin_gens = [self.B.pointed_loops[i-1] for i in self.AtoB[1:]]
-        return self._thin_gens
+        return [self.B.pointed_loops[i-1] for i in self.AtoB[1:]]
     
-    @property
+    @lazy_attribute
     def fat_gens(self):
-        if not hasattr(self, "_fat_gens"):
-            points = [i-1 for i in self.AtoB[1:]]
-            paths = [[]]
-            first=True
-            for i, path in enumerate(self.B.pointed_loops):
-                if i in points:
-                    if first:
-                        first = False
-                    else:
-                        paths += [[]]
-                if i!=self.AtoB[0]-1:
-                    paths[-1] += path
-            self._fat_gens = [Util.simplify_path(path) for path in paths]
-        return self._fat_gens
+        points = [i-1 for i in self.AtoB[1:]]
+        paths = [[]]
+        first=True
+        for i, path in enumerate(self.B.pointed_loops):
+            if i in points:
+                if first:
+                    first = False
+                else:
+                    paths += [[]]
+            if i!=self.AtoB[0]-1:
+                paths[-1] += path
+        return [Util.simplify_path(path) for path in paths]
     
-    @property
+    @lazy_attribute
     def lift(self):
-        if not hasattr(self, "_lift"):
-            words = [self.wordB(path) for path in self.fat_gens]
-            proj = self.alphabet.hom(words)
-            self._lift = Util.invert_morphism(proj)
-        return self._lift
+        words = [self.wordB(path) for path in self.fat_gens]
+        proj = self.alphabet.hom(words)
+        return Util.invert_morphism(proj)
     
     def specialize_path(self, path):
         """Take a path of A and yield a path B with the same homotopy class"""

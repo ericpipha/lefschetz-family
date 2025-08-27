@@ -42,6 +42,7 @@ from sage.quadratic_forms.quadratic_form import QuadraticForm
 from sage.misc.flatten import flatten
 
 from sage.misc.prandom import randint
+from sage.misc.lazy_attribute import lazy_attribute
 
 from .voronoi import FundamentalGroupVoronoi
 from .integrator_simultaneous import IntegratorSimultaneous
@@ -82,111 +83,93 @@ class DoubleCover(object):
             fg = self.fundamental_group # this allows reordering the critical points straight away and prevents shenanigans. There should be a better way to do this
     
     
-    @property
+    @lazy_attribute
     def intersection_product_modification(self):
         """The intersection matrix of the modification of the hypersurface"""
-        if not hasattr(self,'_intersection_product_modification'):
-            assert self.dim!=0, "no modification in dimension 0"
-            self._intersection_product_modification = self.monodromy_representation.intersection_product
-        return self._intersection_product_modification
+        assert self.dim!=0, "no modification in dimension 0"
+        return self.monodromy_representation.intersection_product
 
-    @property
+    @lazy_attribute
     def monodromy_representation(self):
         """The monodromy representation associated to the modification of the hypersurface"""
-        if not hasattr(self,'_monodromy_representation'):
-            assert self.dim!=0, "no monodromy_representation in dimension 0"
-            if self.dim == 2:
-                monodromy_representation = MonodromyRepresentationSurface(self.monodromy_matrices, self.fibre.intersection_product)
-            else:
-                monodromy_representation = MonodromyRepresentationGeneric(self.monodromy_matrices, self.fibre.intersection_product)
-                monodromy_representation._add = 0 if self.dim%2==1 else 2
-            self._monodromy_representation = monodromy_representation
-        return self._monodromy_representation
+        assert self.dim!=0, "no monodromy_representation in dimension 0"
+        if self.dim == 2:
+            monodromy_representation = MonodromyRepresentationSurface(self.monodromy_matrices, self.fibre.intersection_product)
+        else:
+            monodromy_representation = MonodromyRepresentationGeneric(self.monodromy_matrices, self.fibre.intersection_product)
+            monodromy_representation._add = 0 if self.dim%2==1 else 2
+        return monodromy_representation
     
-    @property
+    @lazy_attribute
     def intersection_product(self):
         """The intersection matrix of the hypersurface"""
-        if not hasattr(self,'_intersection_product'):
-            if self.dim==0:
-                self._intersection_product = identity_matrix(self.degree)
-            elif self.dim==1:
-                self._intersection_product = self.intersection_product_modification
-            else:
-                homology = matrix(self.homology)
-                IP = homology * self.intersection_product_modification * homology.transpose()
-                assert IP.det() in [1,-1], "intersection product is not unitary"
-                self._intersection_product = IP
-        return self._intersection_product
+        if self.dim==0:
+            return identity_matrix(self.degree)
+        elif self.dim==1:
+            return self.intersection_product_modification
+        else:
+            homology = matrix(self.homology)
+            IP = homology * self.intersection_product_modification * homology.transpose()
+            assert IP.det() in [1,-1], "intersection product is not unitary"
+            return IP
 
-    @property
+    @lazy_attribute
     def homology(self):
         """An embedding of the homology of the hypersurface in the homology of the modification."""
-        if not hasattr(self,'_homology'):
-            if self.dim<2:
-                self._homology = identity_matrix(len(self.extensions)).rows()
-            else:
-                exceptional_divisors = matrix(self.exceptional_divisors).transpose()
-                product_with_exdiv = self.intersection_product_modification * exceptional_divisors
-                product_with_exdiv = product_with_exdiv.change_ring(ZZ)
-                self._homology = product_with_exdiv.kernel().basis()
-        return self._homology
+        if self.dim<2:
+            return identity_matrix(len(self.extensions)).rows()
+        else:
+            exceptional_divisors = matrix(self.exceptional_divisors).transpose()
+            product_with_exdiv = self.intersection_product_modification * exceptional_divisors
+            product_with_exdiv = product_with_exdiv.change_ring(ZZ)
+            return product_with_exdiv.kernel().basis()
 
-    @property
+    @lazy_attribute
     def period_matrix_modification(self):
         """The period matrix of the modification of the hypersurface"""
-        if not hasattr(self, '_period_matrix_modification'):
-            integrated_thimbles = self.integrated_thimbles
-            add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
-            add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
-            homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
-            primary_lattice = self.monodromy_representation.primary_lattice
-            self._period_matrix_modification =  integrated_thimbles * homology_mat * primary_lattice.inverse()
-        return self._period_matrix_modification
+        integrated_thimbles = self.integrated_thimbles
+        add  = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
+        add += [vector([0]*len(self.monodromy_representation.thimbles))] * 2 if self.dim%2 ==0 else []
+        homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
+        primary_lattice = self.monodromy_representation.primary_lattice
+        return integrated_thimbles * homology_mat * primary_lattice.inverse()
 
-    @property
+    @lazy_attribute
     def period_matrix(self):
         """The period matrix of the hypersurface"""
-        if not hasattr(self, '_period_matrix'):
-            if self.dim%2 == 1:
-                self._period_matrix = self.period_matrix_modification * matrix(self.homology).transpose()
-            else:
-                self._period_matrix = block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
-        return self._period_matrix
+        if self.dim%2 == 1:
+            return self.period_matrix_modification * matrix(self.homology).transpose()
+        else:
+            return block_matrix([[self.period_matrix_modification*matrix(self.homology).transpose()], [matrix(self.intersection_product*self.lift_modification(self.fibre_class))]])
     
-    @property
+    @lazy_attribute
     def holomorphic_period_matrix_modification(self):
         """The holomorphic period matrix of the modification of the hypersurface"""
-        if not hasattr(self, '_holomorphic_period_matrix_modification'):
-            if self.dim==0:
-                self._holomorphic_period_matrix_modification = self.period_matrix
-            else:
-                integrated_thimbles_holomorphic = self.integrated_thimbles_holomorphic
-                add = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
-                add += [vector([0]*len(self.monodromy_representation.thimbles))]*2 if self.dim%2 ==0 else []
-                homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
-                primary_lattice = self.monodromy_representation.primary_lattice
-                self._holomorphic_period_matrix_modification =  integrated_thimbles_holomorphic * homology_mat * primary_lattice.inverse()
-        return self._holomorphic_period_matrix_modification
+        if self.dim==0:
+            return self.period_matrix
+        else:
+            integrated_thimbles_holomorphic = self.integrated_thimbles_holomorphic
+            add = [vector([0]*len(self.monodromy_representation.thimbles))] * len(flatten(self.monodromy_representation.components_of_singular_fibres))
+            add += [vector([0]*len(self.monodromy_representation.thimbles))]*2 if self.dim%2 ==0 else []
+            homology_mat = matrix(self.monodromy_representation.extensions + add).transpose()
+            primary_lattice = self.monodromy_representation.primary_lattice
+            return integrated_thimbles_holomorphic * homology_mat * primary_lattice.inverse()
 
-    @property
+    @lazy_attribute
     def holomorphic_period_matrix(self):
         """The holomorphic period matrix of the hypersurface"""
-        if not hasattr(self, '_holomorphic_period_matrix'):
-            if self.dim==0:
-                self._holomorphic_period_matrix = self.period_matrix
-            else:
-                periods_modification = self.holomorphic_period_matrix_modification
-                homology = matrix(self.homology).transpose()
-                self._holomorphic_period_matrix = periods_modification * homology
-        return self._holomorphic_period_matrix
+        if self.dim==0:
+            return self.period_matrix
+        else:
+            periods_modification = self.holomorphic_period_matrix_modification
+            homology = matrix(self.homology).transpose()
+            return periods_modification * homology
 
-    @property
+    @lazy_attribute
     def holomorphic_forms(self):
         """The holomorphic cohomology classes."""
-        if not hasattr(self, "_holomorphic_forms"):
-            mindeg = min([m.degree() for m in self.cohomology])
-            self._holomorphic_forms = [m for m in self.cohomology if m.degree()==mindeg]
-        return self._holomorphic_forms
+        mindeg = min([m.degree() for m in self.cohomology])
+        return [m for m in self.cohomology if m.degree()==mindeg]
 
 
     @property
@@ -194,38 +177,30 @@ class DoubleCover(object):
         """The defining equation of the hypersurface."""
         return self._P
 
-    @property
+    @lazy_attribute
     def degree(self):
-        if not hasattr(self,'_degree'):
-            self._degree = self.P.degree()
-        return self._degree
+        return self.P.degree()
     
-    @property
+    @lazy_attribute
     def dim(self):
-        if not hasattr(self,'_dim'):
-            self._dim = len(self.P.parent().gens())-1
-        return self._dim
+        return len(self.P.parent().gens())-1
 
-    @property
+    @lazy_attribute
     def cohomology(self):
-        if not hasattr(self,'_cohomology'):
-            assert self.smooth,"Cannot compute cohomology of singular double covers (yet)."
-            self._cohomology = Cohomology(self.P, shift=self.shift).basis()
-        return self._cohomology
+        assert self.smooth,"Cannot compute cohomology of singular double covers (yet)."
+        return Cohomology(self.P, shift=self.shift).basis()
     
-    @property
+    @lazy_attribute
     def family(self):
-        if not hasattr(self,'_family'):
-            if self.dim==1:
-                R = PolynomialRing(QQ, ['x0','x1'])
-                S = PolynomialRing(R, 't')
-                t = S.gens()[0]
-                x0,x1 = R.gens()
-                self._family = Family(x0**2+x1**2*self.P(t+1, 1))
-            else:
-                denom, RtoS = self._RtoS()
-                self._family = Family(RtoS(self.P), denom=denom**self.degree, shift=self.shift)
-        return self._family
+        if self.dim==1:
+            R = PolynomialRing(QQ, ['x0','x1'])
+            S = PolynomialRing(R, 't')
+            t = S.gens()[0]
+            x0,x1 = R.gens()
+            return Family(x0**2+x1**2*self.P(t+1, 1))
+        else:
+            denom, RtoS = self._RtoS()
+            return Family(RtoS(self.P), denom=denom**self.degree, shift=self.shift)
     
 
     @property
@@ -364,11 +339,9 @@ class DoubleCover(object):
     def vanishing_cycles(self):
         return self.monodromy_representation.vanishing_cycles
 
-    @property
+    @lazy_attribute
     def extensions(self):
-        if not hasattr(self, '_extensions'):
-            self._extensions = self.monodromy_representation.extensions
-        return self._extensions
+        return self.monodromy_representation.extensions
 
     @property
     def thimble_extensions(self):
@@ -413,11 +386,9 @@ class DoubleCover(object):
             logger.info("Thimble monodromy computed in %s.", duration_str)
         return self._thimble_monodromy
     
-    @property
+    @lazy_attribute
     def invariant(self): # TODO : in dim >0 this is just the fibre. 
-        if not hasattr(self, '_invariant'):
-            self._invariant = vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
-        return self._invariant
+        return vector(Util.find_complement(matrix([chain for chain, _ in self.thimble_extensions])))
 
     @property
     def exceptional_divisors(self):
