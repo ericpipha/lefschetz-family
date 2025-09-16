@@ -166,9 +166,9 @@ class MonodromyRepresentation(object):
             B = D.solve_left(matrix(infinity_loops) * V).change_ring(ZZ)*U
             quotient_basis = Util.find_complement(B)
             if quotient_basis.nrows()==0:
-                self._extensions_desingularisation = kerdelta.submatrix(0,0,0).rows()
+                self._extensions_desingularisation = kerdelta.submatrix(0,0,0).change_ring(ZZ).rows()
             else:
-                self._extensions_desingularisation = (quotient_basis*kerdelta).rows()
+                self._extensions_desingularisation = (quotient_basis*kerdelta).change_ring(ZZ).rows()
         return self._extensions_desingularisation
 
 

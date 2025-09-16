@@ -21,7 +21,6 @@ try:
 except ImportError:
     import sage.all__sagemath_modules
 
-from .numperiods.family import Family
 from .numperiods.integerRelations import IntegerRelations
 from ore_algebra import *
 
@@ -33,16 +32,11 @@ from sage.rings.imaginary_unit import I
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.rational_field import QQ
 from sage.rings.finite_rings.integer_mod_ring import IntegerModRing
-from sage.functions.other import factorial
 from sage.functions.other import floor
 from sage.matrix.constructor import matrix
-from sage.matrix.special import identity_matrix
 from sage.matrix.special import diagonal_matrix
-from sage.matrix.special import block_matrix
-from sage.matrix.special import block_diagonal_matrix
 from sage.matrix.special import zero_matrix
 from sage.arith.functions import lcm
-from sage.arith.misc import gcd
 from sage.arith.misc import factor
 from sage.symbolic.constants import pi
 from sage.functions.transcendental import zeta
@@ -59,7 +53,6 @@ from .util import Util
 from .context import Context
 
 import logging
-import time
 
 logger = logging.getLogger(__name__)
 

@@ -227,6 +227,7 @@ class HomotopyRepresentation(object):
         return [l.monodromy_matrix for l in self.loaded_paths]
 
     def act_by_braid(self, i, p):
+        """returns the HomotopyRepresentation obtained by acting with braid i with power p."""
         assert i<len(self.loaded_paths)-1, "braid index is too high"
         indices = self.loaded_paths[:i]
         if p==1:
@@ -261,7 +262,6 @@ def homotopy_representation_from_allowable_loop(allowable_loop):
         c = AL[:n]
         done += [AL[n:n+1].conjugate(c)]
         AL = c + AL[n+1:]
-    print(AL)
     AL = - allowable_loop + sum(HomotopyRepresentation(allowable_loop.fibration).loaded_paths)
     for k in range(len(fibration.critical_values)):
         if k in inside_points:
