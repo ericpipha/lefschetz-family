@@ -236,7 +236,7 @@ class Hypersurface(object):
     
     @property
     def cohomology(self):
-        return [w * factorial((w.degree()+self.dim+2)//self.P.degree() -2) for w in self.cohomology_internal] 
+        return [w * factorial((w.degree()+self.dim+2)//self.P.degree() -1) for w in self.cohomology_internal] 
     
     @property
     def family(self):
