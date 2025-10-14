@@ -813,9 +813,10 @@ class Hypersurface(object):
     @property
     def hyperplane_class(self):
         assert self.dim %2 ==0, "no hyperplane class in odd dimensions"
-        CB = matrix([self.fibre_class] + self.exceptional_divisors)
-        IP = CB * self.intersection_product_modification * matrix(self.exceptional_divisors).transpose()
-        hyperplane_class = matrix(self.homology).solve_left(IP.left_kernel_matrix() * CB).row(0)
+        # CB = matrix([self.fibre_class] + self.exceptional_divisors)
+        # IP = CB * self.intersection_product_modification * matrix(self.exceptional_divisors).transpose()
+        # hyperplane_class = matrix(self.homology).solve_left(IP.left_kernel_matrix() * CB).row(0)
+        hyperplane_class = self.lift_modification(self.fibre_class)
         return hyperplane_class.change_ring(ZZ)
     
     @property
