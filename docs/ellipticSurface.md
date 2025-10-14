@@ -69,8 +69,7 @@ surface = EllipticSurface(P, nbits=1500)
 surface.mordell_weil_lattice
 
 # these are the types of the singular fibres
-for t, _, n in surface.types:
-    print(t+str(n) if t in ['I', 'I*'] else t)
+surface.types
 ```
 
 
