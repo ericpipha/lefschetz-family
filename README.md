@@ -69,6 +69,7 @@ At the Sage prompt, load a modularized top-level environment:
 - [FibreProduct](docs/fibreProduct.md) for computing periods of fibre products of elliptic surfaces.
 - [Fibration](docs/fibration.md) for computing monodromy representations of families of hypersurfaces.
 
+
 ## Performance benchmarking
 
 Here is a runtime benchmark for computing monodromy representations and periods of various types of varieties, with an input precision of 1000 bits:

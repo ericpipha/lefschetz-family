@@ -333,7 +333,7 @@ class Hypersurface(object):
                                        nbits=self.ctx.nbits, 
                                        long_fibration=self.ctx.long_fibration, 
                                        depth=self.ctx.depth+1,
-                                       simultaneous_integration=True
+                                       simultaneous_integration = self.ctx.simultaneous_integration
                                        )
 
         return self._fibre

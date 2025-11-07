@@ -96,7 +96,7 @@ class Integrator(object):
         fragmented_edges = [None]*len(edges)
         for [inp, _], fragments in _fragmented_edges:
             if fragments == 'NO DATA':
-                raise Exception("Failed to fragmentation of edge [%d/%d]."%(inp[0][0], inp[0][1]))
+                raise Exception("Failed fragmentation of edge [%d/%d]."%(inp[0][0], inp[0][1]))
             fragmented_edges[inp[0][0]] = fragments
         end = time.time()
         duration = end-begin
@@ -141,12 +141,12 @@ class Integrator(object):
                     edges_to_integrate+=[e]
 
             edges_to_integrate = [[self.voronoi.vertices[e[0]], self.voronoi.vertices[e[1]]] for e in edges_to_integrate]
-            self._edges_to_integrate = edges_to_integrate # debugging, to delete later
+            # self._edges_to_integrate = edges_to_integrate # debugging, to delete later
             N = len(edges_to_integrate)
             
             integration_result = self.integrate_edges(edges_to_integrate)
 
-            self._integration_result = integration_result # debugging, to delete later
+            # self._integration_result = integration_result # debugging, to delete later
 
             integrated_edges = [None]*len(self.voronoi.edges)
             for index, i in enumerate(index_of_edges_to_integrate):
