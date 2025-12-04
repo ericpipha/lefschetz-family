@@ -246,6 +246,9 @@ class ExceptionalDivisorComputer(object):
             self._isos = isos
             end = time.time()
             duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+            if end-begin >= 24*60*60:
+                ndays = (end-begin)//24*60*60
+                duration_str = str(ndays)+"d "+duration_str
             logger.info("Braid action computed in %s.", duration_str)
         return self._thimble_monodromy
 

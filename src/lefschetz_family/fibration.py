@@ -238,6 +238,9 @@ class Fibration(object):
         
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Integration finished -- total time: %s."% (duration_str))
 
         return transition_matrices
@@ -272,6 +275,9 @@ class Fibration(object):
 
             end = time.time()
             duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+            if end-begin >= 24*60*60:
+                ndays = (end-begin)//24*60*60
+                duration_str = str(ndays)+"d "+duration_str
             logger.info("Fundamental group computed in %s."% (duration_str))
 
             self._critical_values = fundamental_group.points[1:]

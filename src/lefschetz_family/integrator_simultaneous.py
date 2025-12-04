@@ -104,6 +104,9 @@ class IntegratorSimultaneous(object):
         end = time.time()
         duration = end-begin
         duration_str = time.strftime("%H:%M:%S",time.gmtime(duration))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Fragmented edges in %s, starting integration"% (duration_str))
         
         begin = time.time()
@@ -120,6 +123,9 @@ class IntegratorSimultaneous(object):
         end = time.time()
         duration = end-begin
         duration_str = time.strftime("%H:%M:%S",time.gmtime(duration))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
 
         logger.info("Integrated fragments in %s"% (duration_str))
 
@@ -206,6 +212,9 @@ class IntegratorSimultaneous(object):
         end = time.time()
         duration = end-begin
         duration_str = time.strftime("%H:%M:%S",time.gmtime(duration))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
 
         logger.info("[%d] Finished fragmentation of edge [%d/%d] in %s, split into %d fragments"% (os.getpid(), indices[0]+1,indices[1], duration_str, len(fragmented_path)))
         
@@ -226,6 +235,9 @@ class IntegratorSimultaneous(object):
         end = time.time()
         duration = end-begin
         duration_str = time.strftime("%H:%M:%S",time.gmtime(duration))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         prec = str(max([c.rad() for c in  ntm.dense_coefficient_list()]))
         if len(prec)>10:
             cutoff_start = 5 if "." not in prec else prec.index(".") + 2

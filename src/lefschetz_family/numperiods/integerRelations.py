@@ -81,21 +81,21 @@ class IntegerRelations(object):
             self._threshold = kappa*self._norms[self.rank]
             #assert self.rank == 0 or self._norms[self.rank-1] < self._threshold
 
-        self._expected_threshold = kappa*RR(self._beta)**(QQ(nrels)/(m - self.rank))
+        # self._expected_threshold = kappa*RR(self._beta)**(QQ(nrels)/(m - self.rank))
 
         # This will be ultimately exported to json, so we use primitive types.
-        self._numdata = {
-            "logB": int(RR(self._threshold.log(10)))
-        }
+        # self._numdata = {
+        #     "logB": int(RR(self._threshold.log(10)))
+        # }
 
-        if self.rank > 0:
-            self._numdata['N'] = int(self._norms[self.rank-1].ceil())
-            self._numdata['logE'] = int( (self._norms[self.rank-1]/self._beta*m).log(10).ceil() )
-            self._numdata['rarity'] = int(RR(self._beta).log(10)*(QQ(nrels)/(m - self.rank))) - RDF(1+self._numdata['N']).log(10).ceil()
-        else:
-            self._numdata['N'] = int(0)
-            self._numdata['e'] = int(0)
-            self._numdata['rarity'] = int(0)
+        # if self.rank > 0:
+        #     self._numdata['N'] = int(self._norms[self.rank-1].ceil())
+        #     self._numdata['logE'] = int( (self._norms[self.rank-1]/self._beta*m).log(10).ceil() )
+        #     self._numdata['rarity'] = int(RR(self._beta).log(10)*(QQ(nrels)/(m - self.rank))) - RDF(1+self._numdata['N']).log(10).ceil()
+        # else:
+        #     self._numdata['N'] = int(0)
+        #     self._numdata['e'] = int(0)
+        #     self._numdata['rarity'] = int(0)
 
         self.basis = self._redlat[:self.rank, nrels:]
 

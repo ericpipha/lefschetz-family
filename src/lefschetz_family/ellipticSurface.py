@@ -345,6 +345,9 @@ class EllipticSurface(object):
         
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Integration finished -- total time: %s."% (duration_str))
 
         return transition_matrices
@@ -402,6 +405,9 @@ class EllipticSurface(object):
 
             end = time.time()
             duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+            if end-begin >= 24*60*60:
+                ndays = (end-begin)//24*60*60
+                duration_str = str(ndays)+"d "+duration_str
             logger.info("Fundamental group computed in %s."% (duration_str))
 
             self._critical_values = fundamental_group.points[1:]
@@ -633,5 +639,8 @@ class EllipticSurface(object):
             transition_matrices = [block_matrix([[1,0, a],[0,1, b], [0,0,c]]) for a,b,c in zip(intold, intnew, GM)]
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Integration finished -- total time: %s."% (duration_str))
         return transition_matrices

@@ -122,6 +122,9 @@ class RootsBraid(object):
             self._braidQ[i] = True
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Braids computed in %s."% (duration_str))
 
     def braid(self, e):
@@ -159,6 +162,9 @@ class RootsBraid(object):
         end = time.time()
         duration = end-begin
         duration_str = time.strftime("%H:%M:%S",time.gmtime(duration))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         duration_str_steps = ' '.join([time.strftime("%H:%M:%S",time.gmtime(steps[i]-steps[i-1])) for i in range(1, len(steps))])
         logger.info("[%d] Finished computation of braid along edge %d. [total time:%s], [per root: %s]."% (os.getpid(), i, duration_str, duration_str_steps))
 
@@ -261,6 +267,9 @@ class RootsBraid(object):
             self._isomorphismsQ[i] = True
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("Isomorphisms computed in %s."% (duration_str))
 
     @parallel

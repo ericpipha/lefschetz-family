@@ -88,6 +88,8 @@ class Hypersurface(object):
         if basepoint!= None: # it is useful to be able to specify the basepoint to avoid being stuck in arithmetic computations if critical values have very large modulus
             assert basepoint not in self.critical_values, "basepoint is not regular"
             self._basepoint = basepoint
+
+        self.check_smoothness()
     
     def __str__(self):
         s = "Hypersurface of dimension " + str(self.dim)+" and degree " + str(self.degree)
@@ -242,7 +244,7 @@ class Hypersurface(object):
     def family(self):
         if not hasattr(self,'_family'):
             RtoS = self._RtoS()
-            self._family = Family(RtoS(self.P))
+            self._family = Family(RtoS(self.P), basepoint=self.basepoint)
         return self._family
     
 
@@ -402,6 +404,9 @@ class Hypersurface(object):
             self._thimble_monodromy = self._EDC.thimble_monodromy
             end = time.time()
             duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+            if end-begin >= 24*60*60:
+                ndays = (end-begin)//24*60*60
+                duration_str = str(ndays)+"d "+duration_str
             logger.info("Thimble monodromy computed in %s.", duration_str)
         return self._thimble_monodromy
     
@@ -588,6 +593,9 @@ class Hypersurface(object):
         gaussmanin = self.family.gaussmanin()
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("[%d] Gauss-Manin connection computed in %s."% (self.dim, duration_str))
 
         logger.info("[%d] Computing numerical transition matrices for %d integrals (%d edges total)."% (self.dim, rat_coefs[0].nrows(), len(self.fundamental_group.edges)))
@@ -604,6 +612,9 @@ class Hypersurface(object):
             transition_matrices = [block_matrix([[1,0, a],[0,1, b], [0,0,c]]) for a,b,c in zip(intold, intnew, GM)]
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("[%d] Integration finished -- total time: %s."% (self.dim, duration_str))
         return transition_matrices
 
@@ -649,12 +660,21 @@ class Hypersurface(object):
         transition_matrices = integrator.transition_matrices
         end = time.time()
         duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+        if end-begin >= 24*60*60:
+            ndays = (end-begin)//24*60*60
+            duration_str = str(ndays)+"d "+duration_str
         logger.info("[%d] Integration finished -- total time: %s."% (self.dim, duration_str))
         return transition_matrices
+
+    def check_smoothness(self):
+        self.cohomology_internal
+        if self.dim>0:
+            self.fibre.check_smoothness()
 
     @property
     def integrated_thimbles(self):
         if not hasattr(self, '_integrated_thimbles'):
+
             s=len(self.fibre.homology)
             transition_matrices = self.transition_matrices
             R=len(self.cohomology_internal)
@@ -774,6 +794,9 @@ class Hypersurface(object):
 
             end = time.time()
             duration_str = time.strftime("%H:%M:%S",time.gmtime(end-begin))
+            if end-begin >= 24*60*60:
+                ndays = (end-begin)//24*60*60
+                duration_str = str(ndays)+"d "+duration_str
             logger.info("[%d] Fundamental group computed in %s."% (self.dim, duration_str))
 
             self._critical_values = fundamental_group.points[1:]
