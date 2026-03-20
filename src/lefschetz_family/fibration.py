@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 
 class Fibration(object):
-    def __init__(self, P, basepoint=None, fibration=None, fibre=None, cyclic_forms=None, single_integration=True, family=None, **kwds):
+    def __init__(self, P, basepoint=None, fibration=None, fibre=None, cyclic_forms=None, single_integration=True, family=None, critical_values=None, **kwds):
         """P, a homogeneous polynomial defining a family of hypersurfaces.
         """
         
@@ -69,8 +69,11 @@ class Fibration(object):
         else:
             self._family = Family(self.P, basepoint=basepoint)
 
-        _, denom = self._family.gaussmanin()
-        self._critical_values = denom.roots(QQbar, multiplicities=False)
+        if critical_values==None:
+            _, denom = self._family.gaussmanin()
+            self._critical_values = denom.roots(QQbar, multiplicities=False)
+        else:
+            self._critical_values = critical_values
 
         if cyclic_forms!= None: 
             # L = self.family.picard_fuchs_equation(cyclic_forms)

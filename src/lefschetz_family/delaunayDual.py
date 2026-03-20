@@ -323,8 +323,3 @@ class FundamentalGroupDelaunayDual(object):
             self._duality = duality
 
         return self._polygons
-
-
-
-
-

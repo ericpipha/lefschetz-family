@@ -151,7 +151,7 @@ class EllipticSurface(object):
             flatPolRing = PolynomialRing(QQ, ['a','b','c','t'])
             [a,b,c,t] = flatPolRing.gens()
             weierstrass_coefs = WeierstrassForm(self.P(t,a,b,c), [a,b,c])
-            Qt = PolynomialRing(QQ, 't')
+            Qt = PolynomialRing(self.P.base_ring().base_ring(), 't')
             t = Qt.gens()[0]
             weierstrass_coefs =  [c(t=t) for c in weierstrass_coefs]
             self._discriminant=Qt(4*weierstrass_coefs[0](t=t)**3 + 27*weierstrass_coefs[1](t=t)**2)
@@ -160,7 +160,7 @@ class EllipticSurface(object):
     @property
     def critical_values(self):
         if not hasattr(self,'_critical_values'):
-            self._critical_values=self.discriminant.roots(QQbar, multiplicities=False)
+            self._critical_values = self.discriminant.roots(QQbar, multiplicities=False)
         return self._critical_values
     
     @property

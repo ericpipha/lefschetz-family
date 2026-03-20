@@ -3,10 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "lefschetz-family"
+name = "CohomInt"
 version = "0.1.20"
 authors = [
-  { name="Eric Pichon-Pharabod", email="eric.pichon@mis.mpg.de" },
+  { name="Eric Pichon-Pharabod", email="eric.pichon@maths.ox.ac.uk" },
 ]
 description = "This package implements algorithms relying on Lefschetz fibration theory to compute periods of algebraic varieties."
 readme = "README.md"

@@ -89,7 +89,7 @@ class Hypersurface(object):
             assert basepoint not in self.critical_values, "basepoint is not regular"
             self._basepoint = basepoint
 
-        self.check_smoothness()
+        # self.check_smoothness()
     
     def __str__(self):
         s = "Hypersurface of dimension " + str(self.dim)+" and degree " + str(self.degree)
@@ -280,7 +280,7 @@ class Hypersurface(object):
             ] + [(f.derivative(var).numerator()*k-self.P.derivative(var)*f.derivative(var).denominator()) for var in _vars]
 
             ideal = S.ideal(eqs).elimination_ideal(S.gens()[:-1])
-            Qt = PolynomialRing(QQ, 't')
+            Qt = PolynomialRing(self.P.base_ring(), 't')
 
             roots_with_multiplicity = Qt(ideal.groebner_basis()[0]).roots(AlgebraicField())
             if not self.ctx.debug and not self.ctx.singular:
