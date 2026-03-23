@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "CohomInt"
-version = "0.1.20"
+name = "lefschetz-family"
+version = "0.1.21"
 authors = [
   { name="Eric Pichon-Pharabod", email="eric.pichon@maths.ox.ac.uk" },
 ]
