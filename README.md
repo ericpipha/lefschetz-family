@@ -93,7 +93,7 @@ Here is a runtime benchmark for computing monodromy representations and periods 
 
 
 ## Contact
-For any question, bug or remark, please contact [eric.pichon@mis.mpg.de](mailto:eric.pichon@mis.mpg.de).
+For any question, bug or remark, please contact [eric.pichon-pharabod@maths.ox.ac.uk](mailto:eric.pichon-pharabod@maths.ox.ac.uk).
 
 ## Roadmap
 Near future milestones:
